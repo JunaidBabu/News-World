@@ -1,12 +1,54 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent"  tools:context=".MainActivity">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
 
 
 
-    <fragment
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.MapFragment"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-</RelativeLayout>
+        android:layout_weight="0.5"
+        android:layout_height="0dp">
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.MapFragment"
+            android:layout_width="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_height="match_parent" />
+
+
+        <LinearLayout
+            android:layout_width="350dp"
+            android:layout_marginTop="20dp"
+            android:padding="10dp"
+            android:layout_marginRight="20dp"
+            android:orientation="vertical"
+            android:background="#88676767"
+            android:layout_height="300dp"
+            android:layout_gravity="right|top">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Kerala"
+                android:id="@+id/place"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="nalla varthaanam"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/news"/>
+
+        </LinearLayout>
+
+
+    </FrameLayout>
+
+</LinearLayout>

@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -31,6 +31,8 @@ public class MainActivity extends Activity implements OnMapReadyCallback {
     float lat=10, lng=80;
     String streetName="";
 
+    TextView place;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +41,7 @@ public class MainActivity extends Activity implements OnMapReadyCallback {
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
+        place = (TextView)findViewById(R.id.place);
     }
 
     public void Clicked(View v){
@@ -84,18 +86,22 @@ public class MainActivity extends Activity implements OnMapReadyCallback {
         unimap.moveCamera(CameraUpdateFactory.newLatLngZoom(ltlng, zoomLevel));
 
         new RequestTask().execute("http://maps.googleapis.com/maps/api/geocode/json?latlng=+"+lat+","+lng+"+&sensor=true");
-        Log.i("url", "http://maps.googleapis.com/maps/api/geocode/json?latlng=+"+lat+","+lng+"+&sensor=true");
+        //Log.i("url", "http://maps.googleapis.com/maps/api/geocode/json?latlng=+"+lat+","+lng+"+&sensor=true");
     }
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        Toast.makeText(this, String.valueOf(event.getKeyCode()), Toast.LENGTH_SHORT).show();
+        //This is the filter
+        if (event.getAction()!=KeyEvent.ACTION_UP)
+            return true;
+        //Toast.makeText(this, String.valueOf(event.getKeyCode()), Toast.LENGTH_SHORT).show();
 
-        LatLng sydney = new LatLng(-33.867, 151.206);
-        zoomLevel++;
+        moveMap(String.valueOf(event.getKeyCode()));
+        //LatLng sydney = new LatLng(-33.867, 151.206);
+       // zoomLevel++;
         //map.setMyLocationEnabled(true);
-        unimap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, zoomLevel));
+       // unimap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, zoomLevel));
 
-        Log.i("key pressed", String.valueOf(event.getKeyCode()));
+       // Log.i("key pressed", String.valueOf(event.getKeyCode()));
         return true;
         //return super.dispatchKeyEvent(event);
     }
@@ -145,6 +151,7 @@ public class MainActivity extends Activity implements OnMapReadyCallback {
                 //e.printStackTrace();
             }
             Log.i("Result", streetName);
+            place.setText(streetName);
             //Do anything with response..
         }
     }
