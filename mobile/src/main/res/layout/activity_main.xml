@@ -11,7 +11,6 @@
         android:layout_height="0dp"
         android:layout_weight="0.5"
         layout="@layout/remote_buttons" />
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_weight="0.5"
@@ -26,29 +25,33 @@
 
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="350dp"
+            android:layout_marginTop="20dp"
+            android:padding="10dp"
+            android:layout_marginRight="20dp"
             android:orientation="vertical"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true">
+            android:background="#88676767"
+            android:layout_height="300dp"
+            android:layout_gravity="right|top">
 
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Medium Text"
+                android:text="Kerala"
                 android:id="@+id/place"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true" />
 
-            <ListView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/listView" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="nalla varthaanam"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/news"/>
 
         </LinearLayout>
-
-
 
 
     </FrameLayout>

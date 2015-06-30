@@ -3,6 +3,7 @@ package com.example.sony.newsworld;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -43,6 +44,7 @@ public class MainActivity extends Activity implements OnMapReadyCallback {
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
         place = (TextView)findViewById(R.id.place);
         news = (TextView)findViewById(R.id.news);
 
@@ -56,6 +58,7 @@ public class MainActivity extends Activity implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap map) {
         unimap = map;
+        map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
         moveMap("");
 //        map.addMarker(new MarkerOptions()
 //                .title("Sydney")
@@ -153,7 +156,8 @@ public class MainActivity extends Activity implements OnMapReadyCallback {
             }
             Log.i("Result", streetName);
             place.setText(streetName);
-            new RequestNews().execute("http://content.guardianapis.com/search?api-key=test&q=" + streetName);
+            if (streetName.length()>0)
+                new RequestNews().execute("http://content.guardianapis.com/search?api-key=test&q=" + streetName);
             //Do anything with response..
         }
     }
@@ -193,18 +197,21 @@ public class MainActivity extends Activity implements OnMapReadyCallback {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+            String newstext="";
             List<String> list = new ArrayList<String>();
             try {
                 JSONObject json = new JSONObject(result);
                 for(int i=0; i<json.getJSONObject("response").getJSONArray("results").length(); i++){
                     list.add(json.getJSONObject("response").getJSONArray("results").getJSONObject(i).getString("webTitle"));
+                    newstext+="<br/>&#8226;"+list.get(i);
                 }
                 Log.d("List", list.toString());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            news.setText(list.toString());
+
+            news.setText(Html.fromHtml(newstext));
             //Do anything with response..
         }
     }
