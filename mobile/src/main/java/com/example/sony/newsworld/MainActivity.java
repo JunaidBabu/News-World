@@ -8,13 +8,19 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
+import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -25,6 +31,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class MainActivity extends Activity implements OnMapReadyCallback {
 
@@ -60,6 +67,7 @@ public class MainActivity extends Activity implements OnMapReadyCallback {
         unimap = map;
         map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
         moveMap("");
+        addHeatMap();
 //        map.addMarker(new MarkerOptions()
 //                .title("Sydney")
 //                .snippet("The most populous city in Australia.")
@@ -111,6 +119,50 @@ public class MainActivity extends Activity implements OnMapReadyCallback {
     }
 
 
+    private ArrayList<LatLng> readItems() throws JSONException {
+        ArrayList<LatLng> list = new ArrayList<LatLng>();
+        //InputStream inputStream = getResources().openRawResource(resource);
+        //String json = new Scanner(inputStream).useDelimiter("\\A").next();
+        JSONArray array = new JSONArray("[\n"+
+                "{\"lat\" : 13.5107885, \"lng\" : 76.9810854} ,\n" +
+                "{\"lat\" : 13.1112066, \"lng\" : 77.7309023} ,\n" +
+                "{\"lat\" : 13.0055222, \"lng\" : 77.167853} ,\n" +
+                "{\"lat\" : 25.2741133, \"lng\" : 79.0068423} ,\n" +
+                "{\"lat\" : 16.3848547, \"lng\" : 80.4822656} ,\n" +
+                "{\"lat\" : 20.1071181, \"lng\" : 78.8750064} ,\n" +
+                "{\"lat\" : 17.5480969, \"lng\" : 79.4365298} ,\n" +
+                "{\"lat\" : 14.63238, \"lng\" : 79.8677 } ,\n" +
+                "{\"lat\" : -37.8361, \"lng\" : 144.845 } ,\n" +
+                "{\"lat\" : -38.4034, \"lng\" : 144.192 } ,\n" +
+                "{\"lat\" : -38.7597, \"lng\" : 143.67 } ,\n" +
+                "{\"lat\" : -36.9672, \"lng\" : 141.083 }\n" +
+                "]");
+        for (int i = 0; i < array.length(); i++) {
+            JSONObject object = array.getJSONObject(i);
+            double lat = object.getDouble("lat");
+            double lng = object.getDouble("lng");
+            list.add(new LatLng(lat, lng));
+        }
+        return list;
+    }
+    private void addHeatMap() {
+        List<LatLng> list = null;
+
+        // Get the data: latitude/longitude positions of police stations.
+        try {
+            list = readItems();
+        } catch (JSONException e) {
+            Toast.makeText(this, "Problem reading list of locations.", Toast.LENGTH_LONG).show();
+        }
+
+        // Create a heat map tile provider, passing it the latlngs of the police stations.
+        HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder()
+                .data(list)
+                .build();
+
+        // Add a tile overlay to the map, using the heat map tile provider.
+        TileOverlay mOverlay = unimap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+    }
 
     public class RequestLocation extends AsyncTask<String, String, String> {
 
@@ -156,8 +208,17 @@ public class MainActivity extends Activity implements OnMapReadyCallback {
             }
             Log.i("Result", streetName);
             place.setText(streetName);
-            if (streetName.length()>0)
-                new RequestNews().execute("http://content.guardianapis.com/search?api-key=test&q=" + streetName);
+            if (streetName.length()>0){
+                try {
+                    String[] tokens = streetName.replaceAll("\\d", "").replaceAll(" ", "").split(",", -1);
+                    //Log.e("String", tokens[tokens.length - 1] + tokens[tokens.length - 2]);
+                    String url="http://content.guardianapis.com/search?api-key=test&q=" + tokens[tokens.length - 1] +",%20"+ tokens[tokens.length - 2];
+                    Log.i("URL", url);
+                    new RequestNews().execute(url);
+                }catch (Exception e){
+
+                }
+            }
             //Do anything with response..
         }
     }
@@ -205,7 +266,7 @@ public class MainActivity extends Activity implements OnMapReadyCallback {
                     list.add(json.getJSONObject("response").getJSONArray("results").getJSONObject(i).getString("webTitle"));
                     newstext+="<br/>&#8226;"+list.get(i);
                 }
-                Log.d("List", list.toString());
+                //Log.d("List", list.toString());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
